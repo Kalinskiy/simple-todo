@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 
 import AppHeader from '../app-header';
 import SearchPanel from '../search-panel';
@@ -15,126 +15,99 @@ const AppBlock = styled.div`
   max-width: 800px;
 `
 
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            data: [
-                {id: v1(), label: 'Going to learn React', important: true, like: false},
-                {id: v1(), label: 'That is so good', important: false, like: true},
-                {id: v1(), label: 'I need some break...', important: false, like: false},
-            ],
 
+const App = () => {
+    const [data, setData] = useState([
+            {id: v1(), label: 'Going to learn React', important: true, like: true},
+            {id: v1(), label: 'That is so good', important: false, like: false},
+            {id: v1(), label: 'I need some break...', important: false, like: false},
+        ],
+    );
+    const [term, setTerm] = useState('')
+    const [filter, setFilter] = useState('all')
+    const likedCount = data.filter(obj => obj.like).length
+    const allPosts = data.length
+
+
+    const deleteItem = (id) => {
+        const newArr = data.filter(obj => obj.id !== id)
+        setData(newArr)
+    }
+
+    const onAddItem = (body) => {
+        const newItem = {
+            label: body,
             important: false,
+            id: v1(),
             like: false
         }
-        this.deleteItem = this.deleteItem.bind(this);
-        this.onAddItem = this.onAddItem.bind(this);
-        this.onToggleImportant = this.onToggleImportant.bind(this);
-        this.onToggleLiked = this.onToggleLiked.bind(this);
-        this.filterLiked = this.filterLiked.bind(this);
-        this.filterAll = this.filterAll.bind(this);
+        setData([...data, newItem])
     }
 
-    deleteItem(id) {
-        this.setState(({data}) => {
-            const newArr = data.filter(obj => obj.id !== id)
-
-            return {
-                data: newArr
-            }
-        });
+    const onToggleImportant = (id) => {
+        const newArray = data.map(obj => obj.id === id ? {...obj, important: !obj.important} : obj)
+        setData(newArray)
     }
 
-    onAddItem(body) {
-        this.setState(({data}) => {
-            const newItem = {
-                label: body,
-                important: false,
-                id: v1()
+    const onToggleLiked = (id) => {
+        const newData = [...data]
+        const newArray = newData.map(obj => obj.id === id ? {...obj, like: !obj.like} : obj)
+        setData(newArray)
+    }
+    const filterPosts = (items, filter) => {
+        switch (filter) {
+            case 'like': {
+                return items.filter(obj => obj.like)
             }
-            return {
-                data: [...data, newItem]
+            case 'all': {
+                return items;
             }
+            default :{
+                return items;
+            }
+        }
+    }
+
+    const searchPost = (items, term) => {
+        if (term.length === 0) {
+            return items;
+        }
+        return items.filter((item) => {
+            return item.label.toLowerCase().indexOf(term) > -1 //возвращает те item, в которых содержится term
         })
     }
+    const visiblePosts = filterPosts(searchPost(data, term), filter)
 
-    toggleElement(id, el) {
-        const {data} = this.state;
-        return data.map(obj => obj.id === id ? {...obj, el: !obj.el} : obj)
-    }
-
-    onToggleImportant(id) {
-        this.setState(({data}) => {
-            const newArray = data.map(obj => obj.id === id ? {...obj, important: !obj.important} : obj)
-            // const newArray = this.toggleElement(id, important);
-            return {
-                data: newArray
-            }
-        })
-    }
-
-    onToggleLiked(id) {
-        this.setState(({data}) => {
-            const newData = [...data]
-            const newArray = newData.map(obj => obj.id === id ? {...obj, like: !obj.like} : obj)
-            return {
-                data: newArray
-            }
-        })
-    }
-
-    filterLiked() {
-        this.setState(({data}) => {
-            const newData = [...data]
-            const newArray = newData.filter(obj => obj.like)
-            console.log(newArray)
-            return {
-                data: newArray
-            }
-        })
-    }
-
-    filterAll() {
-        this.setState(({data}) => {
-            const newData = data.map(obj => obj)
-            console.log(newData)
-            return {
-                data: newData
-            }
-        })
-    }
-
-
-    render() {
-
-        const likedCount = this.state.data.filter(obj => obj.like).length
-        const allPosts = this.state.data.length
-
-        return (
-            <AppBlock>
-                <AppHeader
-                    allPosts={allPosts}
-                    likedCount={likedCount}/>
-                <div className="search-panel d-flex">
-                    <SearchPanel/>
-                    <PostStatusFilter
-                        filterAll={this.filterAll}
-                        likedPosts={this.filterLiked}/>
-                </div>
-                <PostList
-                    posts={this.state.data}
-                    onDelete={this.deleteItem}
-                    onToggleImportant={this.onToggleImportant}
-                    onToggleLiked={this.onToggleLiked}
-                    important={this.state.important}
-                    like={this.state.like}
+    return (
+        <AppBlock>
+            <AppHeader
+                allPosts={allPosts}
+                likedCount={likedCount}/>
+            <div className="search-panel d-flex">
+                <SearchPanel
+                    term={term}
+                    setTerm={setTerm}
                 />
-                <PostAddForm
-                    onAddItem={this.onAddItem}
+                <PostStatusFilter
+                    // filterAll={filterAll}
+                    // likedPosts={filterLiked}
+                    filter={filter}
+                    setFilter={setFilter}
                 />
-            </AppBlock>
-        )
-    }
+            </div>
+            <PostList
+                posts={visiblePosts}
+                onDelete={deleteItem}
+                onToggleImportant={onToggleImportant}
+                onToggleLiked={onToggleLiked}
+
+            />
+            <PostAddForm
+                onAddItem={onAddItem}
+            />
+        </AppBlock>
+    )
+
 }
 
+export default App;
