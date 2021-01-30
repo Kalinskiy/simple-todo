@@ -1,8 +1,17 @@
 import React from 'react';
 import './post-list-item.css'
 
-export default function PostListItem(props) {
-    const {label, onDelete, onToggleImportant, onToggleLiked, like, important} = props;
+type PropsType = {
+    label:string
+    like:boolean
+    important:boolean
+    onDelete:()=>void
+    onToggleImportant:()=>void
+    onToggleLiked:()=>void
+
+}
+const PostListItem:React.FC<PropsType> = ({label, onDelete, onToggleImportant, onToggleLiked, like, important}) => {
+
     let classNames = "app-list-item d-flex justify-content-between";
 
     if (important) {
@@ -41,4 +50,4 @@ export default function PostListItem(props) {
     )
 }
 
-
+export default PostListItem;

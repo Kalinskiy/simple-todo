@@ -1,8 +1,13 @@
-import React from 'react';
+import React, {ChangeEvent} from 'react';
 import './search-panel.sass'
 
-const SearchPanel = ({term, setTerm}) => {
-    const onChangeHandler = (e) => {
+
+type PropsType = {
+    term: string
+    setTerm: (term: string) => void
+}
+const SearchPanel: React.FC<PropsType> = ({term, setTerm}) => {
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setTerm(e.currentTarget.value)
     }
     return (

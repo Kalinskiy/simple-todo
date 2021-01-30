@@ -1,23 +1,27 @@
-import React, {useState} from 'react';
+import React, {FormEvent, useState} from 'react';
 import './post-add-form.sass'
 import Alert from "reactstrap/es/Alert";
 
-const PostAddForm = ({onAddItem}) => {
+type PropsType = {
+    onAddItem: (body: string) => void
+}
 
-    const [error, setError] = useState(false)
-    const [value, setValue] = useState('')
+const PostAddForm: React.FC<PropsType> = ({onAddItem}) => {
 
-    const onAddItemHandle = (e) => {
+    const [error, setError] = useState<boolean>(false)
+    const [value, setValue] = useState<string>('')
+
+    const onAddItemHandle = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (!value) {
-          //  setError(true)
+            //  setError(true)
         } else {
             onAddItem(value)
             setError(false)
             setValue('')
         }
     }
-    const onKeyAddHandle = (e) => {
+    const onKeyAddHandle = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.charCode === 13 && value) {
             onAddItem(value)
             setError(false)

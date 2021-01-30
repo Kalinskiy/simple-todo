@@ -1,9 +1,19 @@
 import React from 'react';
 import './post-status-filter.sass'
 import {Button} from 'reactstrap';
+import {FilterType} from "../../types";
 
-const PostStatusFilter = ({filter, setFilter}) => {
-    const buttons = [
+
+type PropsType = {
+    filter: FilterType
+    setFilter: (filter: FilterType) => void
+}
+type ButtonsType = {
+    name: FilterType
+    label: string
+}
+const PostStatusFilter: React.FC<PropsType> = ({filter, setFilter}) => {
+    const buttons: Array<ButtonsType> = [
         {name: 'all', label: 'Все'},
         {name: 'like', label: 'Понравилось'},
     ]
